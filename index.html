@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Тевьят: Чек-лист Искателя</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root{
+    --parchment:#f3e6c9;
+    --parchment-deep:#e9d6ac;
+    --ink:#2c2412;
+    --ink-soft:#5c4d2e;
+    --gold:#c79a3a;
+    --gold-bright:#e8bf5a;
+    --line:#b08e4c;
+
+    --mond-a:#7fb7c9; --mond-b:#3f7a8c;
+    --liyue-a:#d9a23b; --liyue-b:#8c5a1f;
+    --inazuma-a:#9a5fc9; --inazuma-b:#5c2d8c;
+    --sumeru-a:#5fae5a; --sumeru-b:#2f6b2a;
+    --font-a:#5b8fd9; --font-b:#2e5c9c;
+    --natlan-a:#d9633b; --natlan-b:#962e1f;
+    --sub-a:#9a8a6c; --sub-b:#5c4d2e;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: radial-gradient(ellipse at top, #2a2118 0%, #16110a 70%);
+    font-family:'EB Garamond', serif;
+    color:var(--ink);
+    padding:32px 14px 80px;
+  }
+
+  .sheet{
+    max-width:760px;
+    margin:0 auto;
+    background:
+      radial-gradient(circle at 10% 10%, rgba(255,255,255,0.25), transparent 40%),
+      linear-gradient(var(--parchment), var(--parchment-deep));
+    border:2px solid var(--gold);
+    box-shadow: 0 0 0 6px #16110a, 0 0 40px rgba(0,0,0,0.6), inset 0 0 60px rgba(176,142,76,0.25);
+    border-radius:6px;
+    position:relative;
+    overflow:hidden;
+  }
+  .sheet::before, .sheet::after{
+    content:"";
+    position:absolute;
+    width:46px;height:46px;
+    border:2px solid var(--gold);
+    opacity:.55;
+  }
+  .sheet::before{ top:10px; left:10px; border-right:none; border-bottom:none; }
+  .sheet::after{ bottom:10px; right:10px; border-left:none; border-top:none; }
+
+  header{
+    text-align:center;
+    padding:34px 20px 18px;
+    border-bottom:1px solid var(--line);
+  }
+  header .eyebrow{
+    font-family:'Cinzel', serif;
+    letter-spacing:.35em;
+    font-size:11px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+  }
+  header h1{
+    font-family:'Cinzel', serif;
+    font-size:30px;
+    margin:8px 0 4px;
+    color:var(--ink);
+    text-shadow:0 1px 0 rgba(255,255,255,.4);
+  }
+  header p{
+    margin:0;
+    font-style:italic;
+    color:var(--ink-soft);
+    font-size:15px;
+  }
+
+  .progress-wrap{
+    padding:18px 28px 0;
+  }
+  .progress-label{
+    display:flex; justify-content:space-between;
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:.12em;
+    color:var(--ink-soft); margin-bottom:6px;
+  }
+  .progress-track{
+    height:10px; border-radius:6px;
+    background:rgba(92,77,46,0.25);
+    border:1px solid var(--line);
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--gold), var(--gold-bright));
+    width:0%;
+    transition:width .4s ease;
+  }
+
+  .regions{ padding:20px 20px 10px; }
+
+  details.region{
+    margin:14px 0;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:rgba(255,255,255,0.18);
+    overflow:hidden;
+  }
+  details.region[open]{ background:rgba(255,255,255,0.28); }
+
+  details.region summary{
+    list-style:none;
+    cursor:pointer;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:'Cinzel', serif;
+  }
+  details.region summary::-webkit-details-marker{ display:none; }
+  details.region summary .arrow{
+    margin-left:auto;
+    font-size:12px;
+    color:var(--ink-soft);
+    transition:transform .25s ease;
+  }
+  details.region[open] summary .arrow{ transform:rotate(90deg); }
+
+  .vision{
+    width:30px; height:30px;
+    border-radius:50%;
+    flex:0 0 auto;
+    border:2px solid var(--ink);
+    box-shadow:0 0 8px rgba(0,0,0,.25) inset;
+  }
+  .region-title{
+    font-size:17px;
+    color:var(--ink);
+  }
+  .region-sub{
+    font-size:11px;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    font-family:'EB Garamond',serif;
+    font-style:italic;
+  }
+  .region-count{
+    font-family:'EB Garamond',serif;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-left:auto;
+    margin-right:6px;
+    white-space:nowrap;
+  }
+  details.region summary .region-count{ margin-right:0; }
+  details.region summary .arrow{ margin-left:8px; }
+
+  .region-body{
+    padding:6px 16px 16px 16px;
+  }
+
+  .category{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(96px, 1fr));
+    gap:10px;
+    margin:4px 0 2px;
+  }
+
+  label.item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    text-align:center;
+    padding:14px 8px 12px;
+    font-size:13px;
+    cursor:pointer;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.28);
+    transition:background .2s ease, border-color .2s ease, transform .15s ease;
+    position:relative;
+  }
+  label.item:hover{
+    background:rgba(255,255,255,0.45);
+    transform:translateY(-1px);
+  }
+  label.item .icon{
+    font-size:24px;
+    line-height:1;
+    color:var(--ink-soft);
+    transition:color .2s ease, text-shadow .2s ease;
+  }
+  label.item:has(input:checked){
+    background:linear-gradient(160deg, rgba(232,191,90,0.35), rgba(199,154,58,0.22));
+    border-color:var(--gold-bright);
+    box-shadow:0 0 0 1px var(--gold) inset;
+  }
+  label.item:has(input:checked) .icon{
+    color:var(--gold-bright);
+    text-shadow:0 0 8px rgba(232,191,90,0.7);
+  }
+  label.item .badge{
+    position:absolute;
+    top:6px; right:8px;
+    font-size:11px;
+    color:var(--gold-bright);
+    opacity:0;
+    transition:opacity .2s ease;
+  }
+  label.item:has(input:checked) .badge{ opacity:1; }
+
+  input[type=checkbox]{
+    position:absolute;
+    width:1px; height:1px;
+    opacity:0;
+    pointer-events:none;
+  }
+  label.item span.txt{
+    font-family:'Cinzel', serif;
+    font-size:11.5px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--ink);
+  }
+  label.item:has(input:checked) span.txt{
+    color:var(--ink-soft);
+  }
+
+  /* per-region accent colors on summary border-left */
+  details.region.mond{ border-left:5px solid var(--mond-b); }
+  details.region.liyue{ border-left:5px solid var(--liyue-b); }
+  details.region.inazuma{ border-left:5px solid var(--inazuma-b); }
+  details.region.sumeru{ border-left:5px solid var(--sumeru-b); }
+  details.region.fontaine{ border-left:5px solid var(--font-b); }
+  details.region.natlan{ border-left:5px solid var(--natlan-b); }
+  details.region.sub{ border-left:5px solid var(--sub-b); }
+
+  .vision.mond{ background:radial-gradient(circle at 30% 30%, var(--mond-a), var(--mond-b)); }
+  .vision.liyue{ background:radial-gradient(circle at 30% 30%, var(--liyue-a), var(--liyue-b)); }
+  .vision.inazuma{ background:radial-gradient(circle at 30% 30%, var(--inazuma-a), var(--inazuma-b)); }
+  .vision.sumeru{ background:radial-gradient(circle at 30% 30%, var(--sumeru-a), var(--sumeru-b)); }
+  .vision.fontaine{ background:radial-gradient(circle at 30% 30%, var(--font-a), var(--font-b)); }
+  .vision.natlan{ background:radial-gradient(circle at 30% 30%, var(--natlan-a), var(--natlan-b)); }
+  .vision.sub{ background:radial-gradient(circle at 30% 30%, var(--sub-a), var(--sub-b)); }
+
+  .divider{
+    text-align:center;
+    font-family:'Cinzel', serif;
+    letter-spacing:.3em;
+    font-size:11px;
+    color:#b08e4c;
+    margin:26px 0 6px;
+    padding:0 20px;
+  }
+  .divider span{ background:none; }
+
+  footer{
+    text-align:center;
+    padding:18px 20px 28px;
+    font-size:12px;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+
+  .reset-btn{
+    display:block;
+    margin:22px auto 18px;
+    font-family:'Cinzel', serif;
+    font-size:11px;
+    letter-spacing:.15em;
+    text-transform:uppercase;
+    background:transparent;
+    border:1px solid var(--ink-soft);
+    color:var(--ink-soft);
+    padding:6px 14px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{ background:rgba(0,0,0,0.07); }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <header>
+    <div class="eyebrow">Архив Искателя • Тевьят</div>
+    <h1>Чек-лист исследователя</h1>
+    <p>Отметь свой путь по землям семи Архонтов</p>
+  </header>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Прогресс исследования</span>
+      <span id="progressText">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <button class="reset-btn" id="resetBtn">Сбросить весь прогресс</button>
+
+  <div class="regions" id="regions"></div>
+
+  <div class="divider">✦ ✦ ✦</div>
+
+  <footer>«Пусть твой путь будет полон открытий, Искатель Приключений»</footer>
+</div>
+
+<script>
+const REGIONS = [
+  { id:"mondstadt", cls:"mond", title:"Мондштадт", subtitle:"Город Свободы",
+    categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
+  { id:"liyue", cls:"liyue", title:"Ли Юэ", subtitle:"Гавань Контрактов",
+    categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
+  { id:"inazuma", cls:"inazuma", title:"Инадзума", subtitle:"Земля Вечной Грозы",
+    categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
+  { id:"sumeru", cls:"sumeru", title:"Сумеру", subtitle:"Страна Мудрости",
+    categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
+  { id:"fontaine", cls:"fontaine", title:"Фонтейн", subtitle:"Город Справедливости",
+    categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
+  { id:"natlan", cls:"natlan", title:"Натлан", subtitle:"Нация Пиро",
+    categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
+  { id:"nodkrai", cls:"natlan", title:"Нод-Край", subtitle:"Земля Дрейка",
+    categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
+  { id:"snezhnaya", cls:"inazuma", title:"Снежная", subtitle:"Нация Крио",
+    categories:["Зачистка","Статуя","Репутация","Печати","Задания"] }
+];
+
+const SUBAREAS = [
+  { id:"dragonspine", cls:"sub", title:"Драконий хребет", subtitle:"Доп. область — Мондштадт",
+    categories:["Подношения/окулусы","Зачистка","Задания"] },
+  { id:"chasm", cls:"sub", title:"Разлом", subtitle:"Доп. область — Ли Юэ",
+    categories:["Подношения/окулусы","Зачистка","Задания"] },
+  { id:"enkanomiya", cls:"sub", title:"Энканомия", subtitle:"Доп. область — Инадзума",
+    categories:["Подношения/окулусы","Зачистка","Задания"] },
+  { id:"golden-apple", cls:"sub", title:"Архипелаг Золотого Яблока", subtitle:"Доп. область — Инадзума",
+    categories:["Подношения/окулусы","Зачистка","Задания"] },
+  { id:"sea-of-bygone-eras", cls:"sub", title:"Море древности", subtitle:"Доп. область",
+    categories:["Подношения/окулусы","Зачистка","Задания"] },
+  { id:"ancient-sacred-mountain", cls:"sub", title:"Древняя священная гора", subtitle:"Доп. область",
+    categories:["Подношения/окулусы","Зачистка","Задания"] },
+  { id:"temple-of-spaces", cls:"sub", title:"Храм пространства", subtitle:"Доп. область",
+    categories:["Подношения/окулусы","Зачистка","Задания"] },
+  { id:"windswept-peaks", cls:"sub", title:"Пик ветров", subtitle:"Доп. область",
+    categories:["Подношения/окулусы","Зачистка","Задания"] },
+  { id:"tea-hills", cls:"sub", title:"Чайные холмы", subtitle:"Доп. область",
+    categories:["Подношения/окулусы","Зачистка","Задания"] },
+  { id:"oasis-of-rest", cls:"sub", title:"Оазис отдыха", subtitle:"Доп. область",
+    categories:["Подношения/окулусы","Зачистка","Задания"] }
+];
+
+const ICONS = {
+  "Зачистка":"⚔",
+  "Статуя":"⛩",
+  "Репутация":"❖",
+  "Печати":"🔱",
+  "Задания":"✎",
+  "Подношения/окулусы":"◈"
+};
+
+const STORAGE_KEY = "genshin_checklist_state_v1";
+let state = {};
+
+function allItemIds(){
+  const ids=[];
+  [...REGIONS, ...SUBAREAS].forEach(r=>{
+    r.categories.forEach((cat,i)=>{
+      ids.push(r.id+"::"+i);
+    });
+  });
+  return ids;
+}
+
+function renderBlock(r){
+  const det = document.createElement("details");
+  det.className = "region " + r.cls;
+  det.id = "block-"+r.id;
+
+  const sum = document.createElement("summary");
+  sum.innerHTML = `
+    <div class="vision ${r.cls}"></div>
+    <div>
+      <div class="region-title">${r.title}</div>
+      <div class="region-sub">${r.subtitle}</div>
+    </div>
+    <span class="region-count" data-count="${r.id}"></span>
+    <span class="arrow">▶</span>
+  `;
+  det.appendChild(sum);
+
+  const body = document.createElement("div");
+  body.className = "region-body";
+
+  const catDiv = document.createElement("div");
+  catDiv.className = "category";
+
+  r.categories.forEach((cat,i)=>{
+    const id = r.id+"::"+i;
+    const label = document.createElement("label");
+    label.className = "item";
+
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = !!state[id];
+    cb.addEventListener("change", ()=>{
+      state[id] = cb.checked;
+      saveState();
+      updateCount(r.id);
+      updateProgress();
+    });
+
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = "✓";
+
+    const icon = document.createElement("span");
+    icon.className = "icon";
+    icon.textContent = ICONS[cat] || "✦";
+
+    const span = document.createElement("span");
+    span.className = "txt";
+    span.textContent = cat;
+
+    label.appendChild(cb);
+    label.appendChild(badge);
+    label.appendChild(icon);
+    label.appendChild(span);
+    catDiv.appendChild(label);
+  });
+
+  body.appendChild(catDiv);
+  det.appendChild(body);
+  return det;
+}
+
+
+function updateCount(regionId){
+  const r = [...REGIONS, ...SUBAREAS].find(x=>x.id===regionId);
+  let total=r.categories.length, done=0;
+  r.categories.forEach((_,i)=>{
+    if(state[regionId+"::"+i]) done++;
+  });
+  const el = document.querySelector(`.region-count[data-count="${regionId}"]`);
+  if(el) el.textContent = `${done}/${total}`;
+}
+
+function updateProgress(){
+  const ids = allItemIds();
+  const done = ids.filter(id=>state[id]).length;
+  const pct = ids.length ? Math.round(done/ids.length*100) : 0;
+  document.getElementById("progressFill").style.width = pct+"%";
+  document.getElementById("progressText").textContent = pct+"%";
+}
+
+let storageAvailable = true;
+let saveQueued = false;
+
+async function loadState(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY);
+    state = (res && res.value) ? JSON.parse(res.value) : {};
+  }catch(e){
+    state = {};
+  }
+}
+
+async function saveState(){
+  if(saveQueued) return;
+  saveQueued = true;
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify(state));
+  }catch(e){
+    storageAvailable = false;
+  }finally{
+    saveQueued = false;
+  }
+}
+
+async function init(){
+  await loadState();
+  const container = document.getElementById("regions");
+  REGIONS.forEach(r=> container.appendChild(renderBlock(r)) );
+
+  const divider = document.createElement("div");
+  divider.className = "divider";
+  divider.innerHTML = "✦ Дополнительные области ✦";
+  container.appendChild(divider);
+
+  SUBAREAS.forEach(r=> container.appendChild(renderBlock(r)) );
+
+  [...REGIONS, ...SUBAREAS].forEach(r=>updateCount(r.id));
+  updateProgress();
+
+  document.getElementById("resetBtn").addEventListener("click", async ()=>{
+    if(!confirm("Сбросить весь прогресс чек-листа?")) return;
+    state = {};
+    await saveState();
+    document.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+    [...REGIONS, ...SUBAREAS].forEach(r=>updateCount(r.id));
+    updateProgress();
+  });
+}
+
+init();
+</script>
+
+</body>
+</html>
