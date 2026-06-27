@@ -459,31 +459,27 @@ function updateProgress(){
 }
 
 let storageAvailable = true;
-let saveQueued = false;
 
-async function loadState(){
+function loadState(){
   try{
-    const res = await window.storage.get(STORAGE_KEY);
-    state = (res && res.value) ? JSON.parse(res.value) : {};
+    const raw = localStorage.getItem(STORAGE_KEY);
+    state = raw ? JSON.parse(raw) : {};
   }catch(e){
     state = {};
+    storageAvailable = false;
   }
 }
 
-async function saveState(){
-  if(saveQueued) return;
-  saveQueued = true;
+function saveState(){
   try{
-    await window.storage.set(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }catch(e){
     storageAvailable = false;
-  }finally{
-    saveQueued = false;
   }
 }
 
 async function init(){
-  await loadState();
+  loadState();
   const container = document.getElementById("regions");
   REGIONS.forEach(r=> container.appendChild(renderBlock(r)) );
 
@@ -500,7 +496,7 @@ async function init(){
   document.getElementById("resetBtn").addEventListener("click", async ()=>{
     if(!confirm("Сбросить весь прогресс чек-листа?")) return;
     state = {};
-    await saveState();
+    saveState();
     document.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
     [...REGIONS, ...SUBAREAS].forEach(r=>updateCount(r.id));
     updateProgress();
