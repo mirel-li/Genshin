@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Тевьят: Чек-лист Искателя</title>
+<title>Тейват: Чек-лист Искателя Приключений</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
 
@@ -314,21 +314,21 @@
 
 <script>
 const REGIONS = [
-  { id:"mondstadt", cls:"mond", title:"Мондштадт", subtitle:"Город Свободы",
+  { id:"mondstadt", cls:"mond", title:"Мондштадт", subtitle:"Регион Свободы",
     categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
   { id:"liyue", cls:"liyue", title:"Ли Юэ", subtitle:"Гавань Контрактов",
     categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
-  { id:"inazuma", cls:"inazuma", title:"Инадзума", subtitle:"Земля Вечной Грозы",
+  { id:"inazuma", cls:"inazuma", title:"Инадзума", subtitle:"Регион Вечности",
     categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
-  { id:"sumeru", cls:"sumeru", title:"Сумеру", subtitle:"Страна Мудрости",
+  { id:"sumeru", cls:"sumeru", title:"Сумеру", subtitle:"Регион Мудрости",
     categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
-  { id:"fontaine", cls:"fontaine", title:"Фонтейн", subtitle:"Город Справедливости",
+  { id:"fontaine", cls:"fontaine", title:"Фонтейн", subtitle:"Регион Справедливости",
     categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
-  { id:"natlan", cls:"natlan", title:"Натлан", subtitle:"Нация Пиро",
+  { id:"natlan", cls:"natlan", title:"Натлан", subtitle:"Регион Войны",
     categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
-  { id:"nodkrai", cls:"natlan", title:"Нод-Край", subtitle:"Земля Дрейка",
+  { id:"nodkrai", cls:"natlan", title:"Нод-Край", subtitle:"Земля Луны",
     categories:["Зачистка","Статуя","Репутация","Печати","Задания"] },
-  { id:"snezhnaya", cls:"inazuma", title:"Снежная", subtitle:"Нация Крио",
+  { id:"snezhnaya", cls:"inazuma", title:"Снежная", subtitle:"Регион Любви",
     categories:["Зачистка","Статуя","Репутация","Печати","Задания"] }
 ];
 
@@ -339,19 +339,17 @@ const SUBAREAS = [
     categories:["Подношения/окулусы","Зачистка","Задания"] },
   { id:"enkanomiya", cls:"sub", title:"Энканомия", subtitle:"Доп. область — Инадзума",
     categories:["Подношения/окулусы","Зачистка","Задания"] },
-  { id:"golden-apple", cls:"sub", title:"Архипелаг Золотого Яблока", subtitle:"Доп. область — Инадзума",
+  { id:"sea-of-bygone-eras", cls:"sub", title:"Море древности", subtitle:"Доп. область - Фонтейн",
     categories:["Подношения/окулусы","Зачистка","Задания"] },
-  { id:"sea-of-bygone-eras", cls:"sub", title:"Море древности", subtitle:"Доп. область",
-    categories:["Подношения/окулусы","Зачистка","Задания"] },
-  { id:"ancient-sacred-mountain", cls:"sub", title:"Древняя священная гора", subtitle:"Доп. область",
+  { id:"ancient-sacred-mountain", cls:"sub", title:"Древняя священная гора", subtitle:"Доп. область - Натлан",
     categories:["Подношения/окулусы","Зачистка","Задания"] },
   { id:"temple-of-spaces", cls:"sub", title:"Храм пространства", subtitle:"Доп. область",
     categories:["Подношения/окулусы","Зачистка","Задания"] },
-  { id:"windswept-peaks", cls:"sub", title:"Пик ветров", subtitle:"Доп. область",
+  { id:"windswept-peaks", cls:"sub", title:"Пик ветров", subtitle:"Доп. область - Мондштад",
     categories:["Подношения/окулусы","Зачистка","Задания"] },
-  { id:"tea-hills", cls:"sub", title:"Чайные холмы", subtitle:"Доп. область",
+  { id:"tea-hills", cls:"sub", title:"Чайные холмы", subtitle:"Доп. область - Ли Юэ",
     categories:["Подношения/окулусы","Зачистка","Задания"] },
-  { id:"oasis-of-rest", cls:"sub", title:"Оазис отдыха", subtitle:"Доп. область",
+  { id:"oasis-of-rest", cls:"sub", title:"Оазис отдыха", subtitle:"Доп. область - Натлан",
     categories:["Подношения/окулусы","Зачистка","Задания"] }
 ];
 
